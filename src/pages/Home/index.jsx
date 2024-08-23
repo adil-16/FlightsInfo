@@ -100,6 +100,11 @@ const Home = () => {
         <div className="pt-8">
           <FlightDetailsForm onDataFetched={handleDataFetched} />
         </div>
+        {flightData?.length === 0 && (
+          <p className="text-center text-2xl text-red-600 font-bold">
+            No details found!
+          </p>
+        )}
         {flightData?.length > 0 && (
           <div className="pt-12">
             <h2 className="text-4xl text-center underline font-bold text-red-600 mb-6">

@@ -5,7 +5,6 @@ const FlightDetailsForm = ({ onDataFetched }) => {
   const [formData, setFormData] = useState({
     arrivalAirport: "",
     departureAirport: "",
-    arrivalDate: "",
     departureDate: "",
   });
   const [flightData, setFlightData] = useState(null);
@@ -19,13 +18,9 @@ const FlightDetailsForm = ({ onDataFetched }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const { arrivalAirport, departureAirport, arrivalDate, departureDate } =
-      formData;
+    const { arrivalAirport, departureAirport, departureDate } = formData;
 
-    if (
-      (!arrivalAirport && !departureAirport) ||
-      (!arrivalDate && !departureDate)
-    ) {
+    if ((!arrivalAirport && !departureAirport) || !departureDate) {
       console.log("Please provide at least one airport and one date.");
       return;
     }
@@ -36,7 +31,7 @@ const FlightDetailsForm = ({ onDataFetched }) => {
         `${import.meta.env.VITE_BASE_URL}/api/flight-instances`,
         {
           params: {
-            arrivalDate: arrivalDate || undefined,
+            // arrivalDate: arrivalDate || undefined,
             departureDate: departureDate || undefined,
             arrivalAirport: arrivalAirport || undefined,
             departureAirport: departureAirport || undefined,
@@ -92,7 +87,7 @@ const FlightDetailsForm = ({ onDataFetched }) => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
+          {/* <div>
             <label className="block text-sm font-medium text-gray-700">
               Arrival Date
             </label>
@@ -103,7 +98,7 @@ const FlightDetailsForm = ({ onDataFetched }) => {
               onChange={handleChange}
               className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 sm:text-sm"
             />
-          </div>
+          </div> */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Departure Date
