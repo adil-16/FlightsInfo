@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { getAirport } from "airport-codes";
 
 const FlightDetailsForm = ({ onDataFetched }) => {
   const [formData, setFormData] = useState({
@@ -10,6 +9,7 @@ const FlightDetailsForm = ({ onDataFetched }) => {
     departureDate: "",
   });
   const [flightData, setFlightData] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -22,7 +22,6 @@ const FlightDetailsForm = ({ onDataFetched }) => {
     const { arrivalAirport, departureAirport, arrivalDate, departureDate } =
       formData;
 
-    // Basic validation
     if (
       (!arrivalAirport && !departureAirport) ||
       (!arrivalDate && !departureDate)
@@ -30,10 +29,11 @@ const FlightDetailsForm = ({ onDataFetched }) => {
       console.log("Please provide at least one airport and one date.");
       return;
     }
-
+    console.log(import.meta.env.VITE_BASE_URL);
+    setLoading(true);
     try {
       const response = await axios.get(
-        "http://localhost:5000/api/flight-instances",
+        `${import.meta.env.VITE_BASE_URL}/api/flight-instances`,
         {
           params: {
             arrivalDate: arrivalDate || undefined,
@@ -50,6 +50,8 @@ const FlightDetailsForm = ({ onDataFetched }) => {
       console.log("Flight Details:", response.data);
     } catch (error) {
       console.error("Error fetching flight details:", error);
+    } finally {
+      setLoading(false);
     }
   };
   // console.log(flightData);
@@ -119,37 +121,39 @@ const FlightDetailsForm = ({ onDataFetched }) => {
         <div className="flex justify-center">
           <button
             type="submit"
-            className="w-full md:w-auto px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+            className="w-full md:w-auto px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 relative"
+            disabled={loading}
           >
-            Check Details
+            {loading ? (
+              <span className="absolute inset-0 flex items-center justify-center">
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="none"
+                    d="M4 12a8 8 0 1116 0 8 8 0 01-16 0z"
+                  />
+                </svg>
+              </span>
+            ) : (
+              "Check Details"
+            )}
           </button>
         </div>
       </form>
-      {/* {flightData && (
-        <div className="mt-8">
-          <h2 className="text-xl font-bold text-gray-800">Flight Details</h2>
-          {flightData.map((flight) => (
-            <div
-              key={flight.flightNumber}
-              className="p-4 bg-white shadow-md rounded-lg mb-4"
-            >
-              <h3 className="text-lg font-semibold">{flight.flightNumber}</h3>
-              <p>
-                <strong>Arrival Airport:</strong> {flight.arrival.airport}
-              </p>
-              <p>
-                <strong>Departure Airport:</strong> {flight.departure.airport}
-              </p>
-              <p>
-                <strong>Arrival Time:</strong> {flight.arrival.scheduled}
-              </p>
-              <p>
-                <strong>Departure Time:</strong> {flight.departure.scheduled}
-              </p>
-            </div>
-          ))}
-        </div>
-      )} */}
     </div>
   );
 };
