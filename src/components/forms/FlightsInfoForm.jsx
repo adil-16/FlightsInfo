@@ -34,7 +34,7 @@ const FlightDetailsForm = ({ onDataFetched }) => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/flight-instances`,
+        `${import.meta.env.VITE_BASE_URL}/api/flight-instances`,
         {
           params: {
             departureDate: departureDate || undefined,
