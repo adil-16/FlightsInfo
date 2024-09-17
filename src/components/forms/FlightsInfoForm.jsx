@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import Pagination from "../pagination/Pagination";
 
 const FlightDetailsForm = ({ onDataFetched }) => {
   const [formData, setFormData] = useState({
@@ -9,39 +10,65 @@ const FlightDetailsForm = ({ onDataFetched }) => {
   });
   const [flightData, setFlightData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [after, setAfter] = useState("");
+  const [paging, setPaging] = useState({
+    totalPages: 1,
+    next: null,
+  });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [allPagesData, setAllPagesData] = useState([]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const fetchFlightData = async (pageAfter = "", pageNumber) => {
     const { arrivalAirport, departureAirport, departureDate } = formData;
 
     if ((!arrivalAirport && !departureAirport) || !departureDate) {
       console.log("Please provide at least one airport and one date.");
       return;
     }
-    console.log(import.meta.env.VITE_BASE_URL);
+
     setLoading(true);
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_BASE_URL}/api/flight-instances`,
+        `http://localhost:5000/api/flight-instances`,
         {
           params: {
-            // arrivalDate: arrivalDate || undefined,
             departureDate: departureDate || undefined,
             arrivalAirport: arrivalAirport || undefined,
             departureAirport: departureAirport || undefined,
             version: "v2",
             codeType: "IATA,ICAO",
+            after: pageAfter || undefined,
           },
         }
       );
-      setFlightData(response.data.data);
-      onDataFetched(response.data.data);
+      const data = response.data.data;
+
+      setFlightData(data);
+      onDataFetched(data);
+      setAllPagesData((prevData) => {
+        const updatedData = [...prevData];
+        updatedData[pageNumber - 1] = data;
+        return updatedData;
+      });
+
+      const { paging } = response.data;
+      if (paging) {
+        setPaging({
+          totalPages: paging.totalPages,
+          next: paging.next,
+        });
+
+        if (paging.next) {
+          const afterParam = new URL(paging.next).searchParams.get("After");
+          setAfter(afterParam);
+        }
+      }
+
       console.log("Flight Details:", response.data);
     } catch (error) {
       console.error("Error fetching flight details:", error);
@@ -49,7 +76,27 @@ const FlightDetailsForm = ({ onDataFetched }) => {
       setLoading(false);
     }
   };
-  // console.log(flightData);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setAfter("");
+    setAllPagesData([]);
+    fetchFlightData();
+    fetchFlightData("", 1);
+  };
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+    console.log(allPagesData[newPage - 1]);
+
+    if (allPagesData[newPage - 1]) {
+      onDataFetched(allPagesData[newPage - 1]);
+    } else if (newPage > currentPage) {
+      fetchFlightData(after, newPage);
+    }
+  };
+  // console.log(allPagesData);
+  // console.log(currentPage);
 
   return (
     <div className="bg-gray-200 text-black p-10 rounded-lg shadow-xl max-w-4xl mx-auto">
@@ -87,18 +134,6 @@ const FlightDetailsForm = ({ onDataFetched }) => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Arrival Date
-            </label>
-            <input
-              type="date"
-              name="arrivalDate"
-              value={formData.arrivalDate}
-              onChange={handleChange}
-              className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 sm:text-sm"
-            />
-          </div> */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Departure Date
@@ -149,6 +184,14 @@ const FlightDetailsForm = ({ onDataFetched }) => {
           </button>
         </div>
       </form>
+
+      {flightData && paging.totalPages > 1 && (
+        <Pagination
+          totalPages={paging.totalPages}
+          currentPage={currentPage}
+          onPageChange={handlePageChange}
+        />
+      )}
     </div>
   );
 };

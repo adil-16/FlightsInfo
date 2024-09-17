@@ -57,9 +57,9 @@ const Home = () => {
     }
   }, [flightData]);
 
-  console.log(flightData);
-  console.log(airportNames);
-  console.log(countryNames);
+  // console.log(flightData);
+  // console.log(airportNames);
+  // console.log(countryNames);
 
   return (
     <>
