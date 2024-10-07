@@ -158,6 +158,10 @@ const Home = () => {
                     <strong>No of Stops:</strong>{" "}
                     {flight?.segmentInfo?.numberOfStops || "No Stops"}
                   </p>
+                  <p className="mb-2">
+                    <strong>Carrier:</strong>{" "}
+                    {flight?.carrier?.iata || "No Carrier"}
+                  </p>
                 </div>
               ))}
             </div>
