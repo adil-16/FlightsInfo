@@ -57,6 +57,11 @@ const Home = () => {
     }
   }, [flightData]);
 
+  const filteredFlights = flightData?.filter(
+    (flight) =>
+      flight.serviceType?.iata === "P" || flight.serviceType?.iata === "J"
+  );
+
   // console.log(flightData);
   // console.log(airportNames);
   // console.log(countryNames);
@@ -100,18 +105,18 @@ const Home = () => {
         <div className="pt-8">
           <FlightDetailsForm onDataFetched={handleDataFetched} />
         </div>
-        {flightData?.length === 0 && (
+        {filteredFlights?.length === 0 && (
           <p className="text-center text-2xl text-red-600 font-bold">
             No details found!
           </p>
         )}
-        {flightData?.length > 0 && (
+        {filteredFlights?.length > 0 && (
           <div className="pt-12">
             <h2 className="text-4xl text-center underline font-bold text-red-600 mb-6">
               Flight Details
             </h2>
             <div className="p-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {flightData.map((flight) => (
+              {filteredFlights.map((flight) => (
                 <div
                   key={flight.flightNumber}
                   className="p-4 bg-white border rounded-lg"
@@ -131,18 +136,20 @@ const Home = () => {
                       flight.arrival?.airport?.iata ||
                       "N/A"}
                   </p>
-                  <p className="mb-2">
-                    <strong>Departure Airport:</strong>{" "}
-                    {airportNames[flight.departure?.airport?.iata] ||
-                      flight.departure?.airport?.iata ||
-                      "N/A"}
-                  </p>
+                  <br />
                   <p className="mb-2">
                     <strong>Departure Country:</strong>{" "}
                     {countryNames[flight.departure?.country?.code] ||
                       flight.departure?.country?.code ||
                       "N/A"}
                   </p>
+                  <p className="mb-2">
+                    <strong>Departure Airport:</strong>{" "}
+                    {airportNames[flight.departure?.airport?.iata] ||
+                      flight.departure?.airport?.iata ||
+                      "N/A"}
+                  </p>
+                  <br />
                   <p className="mb-2">
                     <strong>Arrival Time:</strong>{" "}
                     {flight.arrival?.time?.utc || "N/A"}
@@ -151,6 +158,7 @@ const Home = () => {
                     <strong>Departure Time:</strong>{" "}
                     {flight.departure?.time?.utc || "N/A"}
                   </p>
+                  <br />
                   <p className="mb-2">
                     <strong>Flight Type:</strong> {flight?.flightType || "N/A"}
                   </p>
@@ -158,6 +166,7 @@ const Home = () => {
                     <strong>No of Stops:</strong>{" "}
                     {flight?.segmentInfo?.numberOfStops || "No Stops"}
                   </p>
+                  <br />
                   <p className="mb-2">
                     <strong>Carrier:</strong>{" "}
                     {flight?.carrier?.iata || "No Carrier"}
