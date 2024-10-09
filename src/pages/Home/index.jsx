@@ -59,12 +59,10 @@ const Home = () => {
 
   const filteredFlights = flightData?.filter(
     (flight) =>
-      flight.serviceType?.iata === "P" || flight.serviceType?.iata === "J"
+      flight.serviceType?.iata === "P" ||
+      flight.serviceType?.iata === "J" ||
+      flight.serviceType?.iata === "G"
   );
-
-  // console.log(flightData);
-  // console.log(airportNames);
-  // console.log(countryNames);
 
   return (
     <>
@@ -152,11 +150,11 @@ const Home = () => {
                   <br />
                   <p className="mb-2">
                     <strong>Arrival Time:</strong>{" "}
-                    {flight.arrival?.time?.utc || "N/A"}
+                    {flight.arrival?.time?.local || "N/A"}
                   </p>
                   <p className="mb-2">
                     <strong>Departure Time:</strong>{" "}
-                    {flight.departure?.time?.utc || "N/A"}
+                    {flight.departure?.time?.local || "N/A"}
                   </p>
                   <br />
                   <p className="mb-2">
