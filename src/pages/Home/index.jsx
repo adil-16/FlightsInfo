@@ -36,9 +36,9 @@ const Home = () => {
 
         const countryCodes = [
           ...new Set([
-            ...flightData.map((flight) => flight.arrival?.country?.code || ""),
+            ...flightData.map((flight) => flight?.leg1?.arrival?.country || ""),
             ...flightData.map(
-              (flight) => flight.departure?.country?.code || ""
+              (flight) => flight?.leg1?.departure?.country || ""
             ),
           ]),
         ];
@@ -59,10 +59,12 @@ const Home = () => {
 
   const filteredFlights = flightData?.filter(
     (flight) =>
-      flight.serviceType?.iata === "P" ||
-      flight.serviceType?.iata === "J" ||
-      flight.serviceType?.iata === "G"
+      flight.leg1?.serviceType === "P" ||
+      flight.leg1?.serviceType === "J" ||
+      flight.leg1?.serviceType === "G"
   );
+
+  console.log(flightData);
 
   return (
     <>
@@ -113,62 +115,146 @@ const Home = () => {
             <h2 className="text-4xl text-center underline font-bold text-red-600 mb-6">
               Flight Details
             </h2>
-            <div className="p-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="p-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 shadow-2xl">
               {filteredFlights.map((flight) => (
                 <div
-                  key={flight.flightNumber}
+                  key={flight.qsi}
                   className="p-4 bg-white border rounded-lg"
                 >
                   <h3 className="text-lg font-semibold text-center mb-4">
-                    Flight Number: {flight.flightNumber}
+                    Flight:{" "}
+                    <span className="font-bold">
+                      {flight?.departure?.airport?.iata} -{" "}
+                      {flight?.arrival?.airport?.iata}
+                    </span>
                   </h3>
-                  <p className="mb-2">
-                    <strong>Arrival Country:</strong>{" "}
-                    {countryNames[flight.arrival?.country?.code] ||
-                      flight.arrival?.country?.code ||
-                      "N/A"}
-                  </p>
-                  <p className="mb-2">
-                    <strong>Arrival Airport:</strong>{" "}
-                    {airportNames[flight.arrival?.airport?.iata] ||
-                      flight.arrival?.airport?.iata ||
-                      "N/A"}
-                  </p>
-                  <br />
-                  <p className="mb-2">
-                    <strong>Departure Country:</strong>{" "}
-                    {countryNames[flight.departure?.country?.code] ||
-                      flight.departure?.country?.code ||
-                      "N/A"}
-                  </p>
-                  <p className="mb-2">
-                    <strong>Departure Airport:</strong>{" "}
-                    {airportNames[flight.departure?.airport?.iata] ||
-                      flight.departure?.airport?.iata ||
-                      "N/A"}
-                  </p>
-                  <br />
-                  <p className="mb-2">
-                    <strong>Arrival Time:</strong>{" "}
-                    {flight.arrival?.time?.local || "N/A"}
-                  </p>
-                  <p className="mb-2">
-                    <strong>Departure Time:</strong>{" "}
-                    {flight.departure?.time?.local || "N/A"}
-                  </p>
-                  <br />
-                  <p className="mb-2">
-                    <strong>Flight Type:</strong> {flight?.flightType || "N/A"}
-                  </p>
-                  <p className="mb-2">
-                    <strong>No of Stops:</strong>{" "}
-                    {flight?.segmentInfo?.numberOfStops || "No Stops"}
-                  </p>
-                  <br />
-                  <p className="mb-2">
-                    <strong>Carrier:</strong>{" "}
-                    {flight?.carrier?.iata || "No Carrier"}
-                  </p>
+                  <h3 className="text-lg font-semibold text-center mb-2">
+                    First Stop Details
+                  </h3>
+
+                  <div>
+                    <p className="mb-2">
+                      <strong> Arrival Country:</strong>{" "}
+                      {flight?.leg1?.arrival?.country ||
+                        flight?.arrival?.country ||
+                        "N/A"}
+                    </p>
+                    <p className="mb-2">
+                      <strong> Arrival Airport:</strong>{" "}
+                      {flight?.leg1?.arrival?.airport?.iata ||
+                        flight?.arrival?.airport?.iata ||
+                        "N/A"}
+                    </p>
+                    <br />
+
+                    <p className="mb-2">
+                      <strong> Departure Country:</strong>{" "}
+                      {flight?.leg1?.departure?.country ||
+                        flight?.departure?.country ||
+                        "N/A"}
+                    </p>
+                    <p className="mb-2">
+                      <strong> Departure Airport:</strong>{" "}
+                      {flight?.leg1?.departure?.airport?.iata ||
+                        flight?.departure?.airport?.iata ||
+                        "N/A"}
+                    </p>
+                    <br />
+
+                    <p className="mb-2">
+                      <strong> Arrival Time:</strong>{" "}
+                      {flight?.leg1?.arrival?.localTime || "N/A"}
+                    </p>
+                    <p className="mb-2">
+                      <strong>Departure Time:</strong>{" "}
+                      {flight?.leg1?.departure?.localTime || "N/A"}
+                    </p>
+                    <br />
+                    <p className="mb-2">
+                      <strong>No of Stops:</strong>{" "}
+                      {flight?.segmentInfo?.numberOfStops || "No Stops"}
+                    </p>
+                    <p className="mb-2">
+                      <strong>Carrier:</strong>{" "}
+                      {flight?.leg1?.carrierCode?.iata || "No Carrier"}
+                    </p>
+                  </div>
+
+                  {/* Leg 2 details if available */}
+                  {flight?.leg2 && (
+                    <div>
+                      <h3 className="text-lg font-semibold text-center mb-2">
+                        Second Stop Details
+                      </h3>
+                      <p className="mb-2">
+                        <strong>Arrival Country:</strong>{" "}
+                        {flight?.leg2?.arrival?.country || "N/A"}
+                      </p>
+                      <p className="mb-2">
+                        <strong>Arrival Airport:</strong>{" "}
+                        {flight?.leg2?.arrival?.airport?.iata || "N/A"}
+                      </p>
+                      <br />
+
+                      <p className="mb-2">
+                        <strong> Departure Country:</strong>{" "}
+                        {flight?.leg2?.departure?.country || "N/A"}
+                      </p>
+                      <p className="mb-2">
+                        <strong> Departure Airport:</strong>{" "}
+                        {flight?.leg2?.departure?.airport?.iata || "N/A"}
+                      </p>
+                      <br />
+
+                      <p className="mb-2">
+                        <strong>Arrival Time:</strong>{" "}
+                        {flight?.leg2?.arrival?.localTime || "N/A"}
+                      </p>
+                      <p className="mb-2">
+                        <strong> Departure Time:</strong>{" "}
+                        {flight?.leg2?.departure?.localTime || "N/A"}
+                      </p>
+                      <br />
+
+                      <p className="mb-2">
+                        <strong>No of Stops:</strong>{" "}
+                        {flight?.leg1?.numberOfStops || "No Stops"}
+                      </p>
+                      <p className="mb-2">
+                        <strong>Carrier:</strong>{" "}
+                        {flight?.leg2?.carrierCode?.iata || "No Carrier"}
+                      </p>
+                    </div>
+                  )}
+
+                  {flight?.leg3 && (
+                    <div>
+                      <p className="mb-2">
+                        <strong>Leg 3 - Arrival Country:</strong>{" "}
+                        {flight?.leg3?.arrival?.country || "N/A"}
+                      </p>
+                      <p className="mb-2">
+                        <strong>Leg 3 - Arrival Airport:</strong>{" "}
+                        {flight?.leg3?.arrival?.airport?.iata || "N/A"}
+                      </p>
+                      <p className="mb-2">
+                        <strong>Leg 3 - Departure Country:</strong>{" "}
+                        {flight?.leg3?.departure?.country || "N/A"}
+                      </p>
+                      <p className="mb-2">
+                        <strong>Leg 3 - Departure Airport:</strong>{" "}
+                        {flight?.leg3?.departure?.airport?.iata || "N/A"}
+                      </p>
+                      <p className="mb-2">
+                        <strong>Leg 3 - Arrival Time:</strong>{" "}
+                        {flight?.leg3?.arrival?.localTime || "N/A"}
+                      </p>
+                      <p className="mb-2">
+                        <strong>Leg 3 - Departure Time:</strong>{" "}
+                        {flight?.leg3?.departure?.localTime || "N/A"}
+                      </p>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

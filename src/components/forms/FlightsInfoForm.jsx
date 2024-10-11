@@ -40,8 +40,6 @@ const FlightDetailsForm = ({ onDataFetched }) => {
             departureDate: departureDate || undefined,
             arrivalAirport: arrivalAirport || undefined,
             departureAirport: departureAirport || undefined,
-            version: "v2",
-            codeType: "IATA,ICAO",
             after: pageAfter || undefined,
           },
         }
@@ -69,7 +67,7 @@ const FlightDetailsForm = ({ onDataFetched }) => {
         }
       }
 
-      console.log("Flight Details:", response.data);
+      // console.log("Flight Details:", response.data);
     } catch (error) {
       console.error("Error fetching flight details:", error);
     } finally {
