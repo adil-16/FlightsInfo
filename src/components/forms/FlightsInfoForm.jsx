@@ -67,7 +67,7 @@ const FlightDetailsForm = ({ onDataFetched }) => {
         }
       }
 
-      // console.log("Flight Details:", response.data);
+      console.log("Flight Details:", response.data);
     } catch (error) {
       console.error("Error fetching flight details:", error);
     } finally {

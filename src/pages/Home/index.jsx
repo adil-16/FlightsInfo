@@ -59,12 +59,16 @@ const Home = () => {
 
   const filteredFlights = flightData?.filter(
     (flight) =>
-      flight.leg1?.serviceType === "P" ||
-      flight.leg1?.serviceType === "J" ||
-      flight.leg1?.serviceType === "G"
+      (flight.leg1?.serviceType === "P" ||
+        flight.leg1?.serviceType === "J" ||
+        flight.leg1?.serviceType === "G") &&
+      (!flight.leg2 ||
+        flight.leg2?.serviceType === "P" ||
+        flight.leg2?.serviceType === "J" ||
+        flight.leg2?.serviceType === "G")
   );
 
-  console.log(flightData);
+  // console.log(flightData);
 
   return (
     <>
