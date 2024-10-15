@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import Pagination from "../pagination/Pagination";
 
-const FlightDetailsForm = ({ onDataFetched }) => {
+const FlightDetailsForm = ({ onDataFetched, handleDirectFlightsFetched }) => {
   const [formData, setFormData] = useState({
     arrivalAirport: "",
     departureAirport: "",
@@ -17,6 +17,7 @@ const FlightDetailsForm = ({ onDataFetched }) => {
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [allPagesData, setAllPagesData] = useState([]);
+  const [isDirectFlight, setIsDirectFlight] = useState(true);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -33,21 +34,27 @@ const FlightDetailsForm = ({ onDataFetched }) => {
 
     setLoading(true);
     try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_BASE_URL}/api/flight-instances`,
-        {
-          params: {
-            departureDate: departureDate || undefined,
-            arrivalAirport: arrivalAirport || undefined,
-            departureAirport: departureAirport || undefined,
-            after: pageAfter || undefined,
-          },
-        }
-      );
+      const endpoint = isDirectFlight
+        ? `${import.meta.env.VITE_BASE_URL}/api/direct-flights`
+        : `${import.meta.env.VITE_BASE_URL}/api/flight-instances`;
+
+      const response = await axios.get(endpoint, {
+        params: {
+          departureDate: departureDate || undefined,
+          arrivalAirport: arrivalAirport || undefined,
+          departureAirport: departureAirport || undefined,
+          after: pageAfter || undefined,
+        },
+      });
       const data = response.data.data;
 
       setFlightData(data);
-      onDataFetched(data);
+      if (isDirectFlight) {
+        handleDirectFlightsFetched(data);
+      } else {
+        onDataFetched(data);
+      }
+
       setAllPagesData((prevData) => {
         const updatedData = [...prevData];
         updatedData[pageNumber - 1] = data;
@@ -86,21 +93,42 @@ const FlightDetailsForm = ({ onDataFetched }) => {
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
     console.log(allPagesData[newPage - 1]);
-
     if (allPagesData[newPage - 1]) {
-      onDataFetched(allPagesData[newPage - 1]);
+      if (isDirectFlight) {
+        handleDirectFlightsFetched(allPagesData[newPage - 1]);
+      } else {
+        onDataFetched(allPagesData[newPage - 1]);
+      }
     } else if (newPage > currentPage) {
       fetchFlightData(after, newPage);
     }
   };
-  // console.log(allPagesData);
-  // console.log(currentPage);
 
   return (
     <div className="bg-gray-200 text-black p-10 rounded-lg shadow-xl max-w-4xl mx-auto">
       <p className="text-2xl font-semibold text-center text-gray-700 mb-6">
         Check Any Flight Details Easily
       </p>
+      <div className="flex justify-center items-center pt-4 pb-8">
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={() => setIsDirectFlight(true)}
+            className={`px-4 py-2 rounded-lg font-medium ${
+              isDirectFlight ? "bg-red-600 text-white" : "bg-gray-300"
+            }`}
+          >
+            Direct Flights
+          </button>
+          <button
+            onClick={() => setIsDirectFlight(false)}
+            className={`px-4 py-2 rounded-lg font-medium ${
+              !isDirectFlight ? "bg-red-600 text-white" : "bg-gray-300"
+            }`}
+          >
+            Connected Flights
+          </button>
+        </div>
+      </div>
       <form className="space-y-6" onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>

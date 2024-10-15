@@ -9,9 +9,14 @@ const Home = () => {
   const [flightData, setFlightData] = useState(null);
   const [airportNames, setAirportNames] = useState({});
   const [countryNames, setCountryNames] = useState({});
+  const [directFlightsData, setDirectFlightsData] = useState(null);
 
   const handleDataFetched = (data) => {
     setFlightData(data);
+  };
+
+  const handleDirectFlightsFetched = (data) => {
+    setDirectFlightsData(data);
   };
 
   useEffect(() => {
@@ -68,8 +73,6 @@ const Home = () => {
         flight.leg2?.serviceType === "G")
   );
 
-  // console.log(flightData);
-
   return (
     <>
       <Navbar />
@@ -107,7 +110,10 @@ const Home = () => {
           LET'S GET STARTED
         </p>
         <div className="pt-8">
-          <FlightDetailsForm onDataFetched={handleDataFetched} />
+          <FlightDetailsForm
+            onDataFetched={handleDataFetched}
+            handleDirectFlightsFetched={handleDirectFlightsFetched}
+          />
         </div>
         {filteredFlights?.length === 0 && (
           <p className="text-center text-2xl text-red-600 font-bold">
